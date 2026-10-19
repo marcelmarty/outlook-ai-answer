@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KI-Antwort</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <link rel="stylesheet" href="src/taskpane.css">
+</head>
+<body>
+  <nav class="tabs">
+    <button class="tab active" data-tab="reply">Antwort</button>
+    <button class="tab" data-tab="settings">Einstellungen</button>
+  </nav>
+
+  <!-- Reply tab -->
+  <section id="tab-reply" class="panel active">
+    <label>Tonalität (nur für diese Antwort)
+      <select id="r-tone">
+        <option value="">Standard aus Einstellungen</option>
+        <option value="match">An erhaltene E-Mail anpassen</option>
+        <option value="formal">Formell (Sie)</option>
+        <option value="friendly">Freundlich-professionell</option>
+        <option value="casual">Locker (Du)</option>
+        <option value="short">Kurz &amp; knapp</option>
+        <option value="custom">Custom (aus Einstellungen)</option>
+      </select>
+    </label>
+    <label>Was soll die Antwort aussagen? (optional)
+      <textarea id="r-hint" rows="3" placeholder="z. B. Termin am Donnerstag 14 Uhr bestätigen, Offerte bis Ende Woche zusichern …"></textarea>
+    </label>
+    <label class="check" id="r-replyall-wrap"><input type="checkbox" id="r-replyall"> Allen antworten</label>
+
+    <button id="btn-generate" class="primary">Antwortvorschlag mit KI erstellen</button>
+
+    <div id="status" class="status"></div>
+    <textarea id="result" rows="14" placeholder="Hier erscheint der Vorschlag – Sie können ihn vor dem Übernehmen bearbeiten." hidden></textarea>
+    <div id="result-actions" class="row" hidden>
+      <button id="btn-use" class="primary">In Antwort übernehmen</button>
+      <button id="btn-retry">Neu generieren</button>
+      <button id="btn-copy">Kopieren</button>
+    </div>
+  </section>
+
+  <!-- Settings tab -->
+  <section id="tab-settings" class="panel">
+    <h3>KI-Endpoint</h3>
+    <label>Anbieter
+      <select id="s-provider">
+        <option value="anthropic">Anthropic Claude (api.anthropic.com)</option>
+        <option value="custom-anthropic">Anthropic-kompatibel (eigene URL)</option>
+        <option value="openai">OpenAI-kompatibel (OpenAI, Azure, Ollama, LM Studio …)</option>
+      </select>
+    </label>
+    <label id="s-baseurl-wrap">Basis-URL
+      <input id="s-baseUrl" type="url" placeholder="https://api.openai.com/v1">
+    </label>
+    <label>API-Key
+      <input id="s-apiKey" type="password" autocomplete="off" placeholder="sk-ant-…">
+    </label>
+    <label>Modell
+      <div class="row">
+        <input id="s-model" list="model-list" placeholder="claude-sonnet-4-5">
+        <button id="btn-models" type="button">Modelle laden</button>
+      </div>
+      <datalist id="model-list"></datalist>
+    </label>
+    <label>Max. Tokens
+      <input id="s-maxTokens" type="number" min="200" max="8000" step="100">
+    </label>
+
+    <h3>Stil</h3>
+    <label>Standard-Tonalität
+      <select id="s-tone">
+        <option value="match">An erhaltene E-Mail anpassen</option>
+        <option value="formal">Formell (Sie)</option>
+        <option value="friendly">Freundlich-professionell</option>
+        <option value="casual">Locker (Du)</option>
+        <option value="short">Kurz &amp; knapp</option>
+        <option value="custom">Custom</option>
+      </select>
+    </label>
+    <label id="s-customTone-wrap">Custom Tone of Voice
+      <textarea id="s-customTone" rows="3" placeholder="z. B. Direkt, freundlich, Sie-Form, keine Floskeln, kurze Sätze …"></textarea>
+    </label>
+    <label>Länge
+      <select id="s-length">
+        <option value="short">Kurz</option>
+        <option value="medium">Mittel</option>
+        <option value="long">Ausführlich</option>
+      </select>
+    </label>
+    <label>Sprache
+      <select id="s-language">
+        <option value="auto">Wie erhaltene E-Mail</option>
+        <option value="de-CH">Deutsch (Schweiz)</option>
+        <option value="de">Deutsch</option>
+        <option value="en">Englisch</option>
+        <option value="fr">Französisch</option>
+        <option value="it">Italienisch</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="s-swissSpelling"> Schweizer Rechtschreibung (ss statt ß)</label>
+    <label class="check"><input type="checkbox" id="s-replyAll"> Standardmässig «Allen antworten»</label>
+
+    <h3>Kontext</h3>
+    <label>Über mich / meine Firma
+      <textarea id="s-aboutMe" rows="3" placeholder="z. B. Marcel Marty, Inhaber WEB NOMADS (Einzelfirma, Winterthur), TYPO3-Entwicklung …"></textarea>
+    </label>
+    <label>Grussformel / Signatur
+      <textarea id="s-signature" rows="3" placeholder="Freundliche Grüsse&#10;Marcel Marty"></textarea>
+    </label>
+    <label>Zusätzliche Anweisungen
+      <textarea id="s-extraInstructions" rows="3" placeholder="z. B. Kunden immer siezen, Ich-Form verwenden …"></textarea>
+    </label>
+
+    <div class="row">
+      <button id="btn-save" class="primary">Speichern</button>
+      <button id="btn-test">Verbindung testen</button>
+    </div>
+    <div id="s-status" class="status"></div>
+    <p class="hint">Einstellungen werden in Ihrem Postfach gespeichert (Outlook Roaming Settings) und gelten in Outlook Web, Desktop und Mobile. Der API-Key wird nur an den gewählten Endpoint gesendet.</p>
+  </section>
+
+  <script src="src/core.js"></script>
+  <script src="src/taskpane.js"></script>
+</body>
+</html>
